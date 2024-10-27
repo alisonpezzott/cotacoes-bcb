@@ -1,0 +1,1 @@
+DateTime.Date(DateTime.LocalNow())
