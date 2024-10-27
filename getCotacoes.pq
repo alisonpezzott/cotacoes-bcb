@@ -1,65 +1,38 @@
-(#"DataInicial" as date, #"DataFinal" as date) as table =>
+(dataInicial as date, dataFinal as date, moeda as text, pagina as number ) =>
+
 let
-    dataInicial = #"DataInicial", //#date(2024, 10, 1),
-    dataFinal =  #"DataFinal", //DateTime.Date(DateTime.LocalNow()),
-    moedas = {"USD", "EUR", "JPY", "GBP", "INR"},
+    // https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaPeriodo(moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?@moeda='EUR'&@dataInicial='01-01-2024'&@dataFinalCotacao='10-27-2024'&$top=100&$skip=0&$format=json&$select=cotacaoCompra,dataHoraCotacao,tipoBoletim
 
-    getCotacoes = ( Data as date, Moeda as text) as nullable number =>
-    let
-        // Data = #date(2024, 10, 14),
-        // Moeda = "USD",
-        startDateTxt = Date.ToText(Data, "yyyyMMdd"),
-        endDateTxt = Date.ToText(Data, "yyyyMMdd"),
+    dataInicialTxt = "'" & Date.ToText(dataInicial, "MM-dd-yyyy") & "'",
+    dataFinalTxt = "'" & Date.ToText(dataFinal, "MM-dd-yyyy") & "'",
+    moeda = "'" & moeda & "'",
+ 
+    url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata",
+    endpoint = "CotacaoMoedaPeriodo(moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)",
 
-        url = "https://economia.awesomeapi.com.br",
-        endpoint = "json/daily/" & Moeda,
-        query = [
-            start_date = startDateTxt,
-            end_date = endDateTxt
-        ],
+    query = [
+        #"@moeda" = moeda,
+        #"@dataInicial" = dataInicialTxt,
+        #"@dataFinalCotacao" = dataFinalTxt,
+        #"$top" = Number.ToText(100),
+        #"$skip" = Number.ToText((pagina - 1) * 100),
+        #"$format" = "json",
+        #"$select" = "dataHoraCotacao,cotacaoCompra,tipoBoletim"
+    ],
 
-        request = Web.Contents (
-            url,
-            [
-                RelativePath = endpoint,
-                Query = query
-            ]
-        ),
+    request = Web.Contents(
+        url,
+        [
+            RelativePath = endpoint,
+            Query = query
+        ]
+    ),
 
-        response = try Number.From(Json.Document(request, 65001){0}[bid], "en-US") otherwise null
-    in
-        response,
-
-    getCotacoesPorMoeda = (dataInicial, dataFinal, moeda) =>
-        let
-            geraDados = List.Generate(
-                () => [ 
-                    Data = dataInicial, 
-                    Cotacao = getCotacoes(Data, moeda), 
-                    Moeda = moeda 
-                ],
-                each [Data] <= dataFinal,
-                each [ 
-                    Data = Date.AddDays([Data], 1), 
-                    Cotacao = getCotacoes(Data, moeda),
-                    Moeda = moeda
-                ]
-            ),
-            saida = Table.FromRecords(geraDados),
-            preenchidoAbaixo = Table.FillDown(saida,{"Cotacao"}),
-            tipoAlterado = Table.TransformColumnTypes(
-                preenchidoAbaixo,{
-                    {"Data", type date}, 
-                    {"Cotacao", Currency.Type}, 
-                    {"Moeda", type text}
-                }
-            )
-        in
-            tipoAlterado,
-            
-
-    saida = Table.Combine(
-        List.Transform(moedas, each getCotacoesPorMoeda(dataInicial, dataFinal, _))
-    )
+    response = Json.Document(request, 65001),
+    lista = response[value],
+    tabela = Table.FromRecords(lista),
+    apenasFechamento = Table.SelectRows(tabela, each ([tipoBoletim] = "Fechamento"))[[dataHoraCotacao], [cotacaoCompra]],
+    colunasFormatadas = Table.TransformColumns(apenasFechamento,{{"dataHoraCotacao", each DateTime.Date(DateTime.From(_)), type date}, {"cotacaoCompra", Number.From, Currency.Type}}),
+    colunasRenomeadas =  Table.RenameColumns(colunasFormatadas,{{"dataHoraCotacao", "DataCotacao"}, {"cotacaoCompra", "Cotacao"}})
 in
-    saida
+    colunasRenomeadas
