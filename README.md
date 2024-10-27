@@ -6,4 +6,6 @@ Recursos: https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/aplicacao#!/re
 
 Os arquivos `*.pq` são as consultas que devem ser copiadas no Power Query.
 
-Também está disponível o arquivo .pbix contendo o projeto completo.
+Também está disponível o arquivo `cotacoes.pbix` contendo o projeto completo contendo todas as queries.
+
+
