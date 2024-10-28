@@ -1,4 +1,4 @@
 let
-    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("jZFLbsIwEECvEjksQEqr7FlBk7R8BAiUBYpYTBOrigi2GOMLcBVUdQMrbkBuwkk6BrnOCrqaj9/TeDRZxnppxAIW1ecK0AOtdghVCUJSs+UHvh++hmG3/Zd2ui9sFWTsrdfQchBQcKH4M+kjISJBELn0lK5P9Y+ZQ20nNQqrRaORoSRK8IpSwAZwq7kCaq7RmS63YpzOiYk1minX/dGxjcLC7/0ZUePyE8GL1Y5jRaOoczk4zeXWGs6WxAy4MLtfvm/PxN0TC02mbgEhUfOvf31/ETtNaZ4/N9JF4yqFVGYRMDEVJYVH51n9Ag==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Moeda = _t, Nome = _t, Formatacao = _t])
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("hZFBTsMwEEWvYjksQ5V9V22TUmgFVaosUNrFkFiVhbGFXV+Aq1SIDay4QXITTsIYS7VpEV3N+M/7tmemrum4XNCUlgwEedBguGBcK6dckCRNkmyQZcM4v6SbtKajKkcm7z8FaALW7DQIDtIZI/bENhlFtgYktEwads40myIx1SAbRYztP/o3984apcGaBvpE8PZ8Pkd6orQC0nIJT6CfLTOA4qMOcJx7Y1GVyBT2ZxxfL++h/uvg4avxEqkFxxmSwuyYFvgUKt3+AHb7Y9PN8h6RaybdCLpXXx4eEg/d3oX/S6Ut2/75+6OrV0VwGcua8+1Wq2g3rTKuDXCxkhzDf0vafAM=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Moeda = _t, Nome = _t, Formatacao = _t])
 in
     Source
