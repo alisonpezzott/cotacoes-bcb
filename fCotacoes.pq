@@ -1,5 +1,5 @@
 let
-    moedas = Table.Buffer(dMoedas[[Moeda]]),
+    moedas = Table.Buffer(Table.SelectRows(dMoedas[[Moeda]], each [Moeda] <> "BRL")),
 
     addDatas = Table.AddColumn(
         moedas,
